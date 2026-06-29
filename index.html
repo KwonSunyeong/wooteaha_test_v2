@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOOTAEHA ANSEUNGKYUNG — Main</title>
+
+<!-- ===================== 스타일 및 폰트 설정 ===================== -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@1,300;1,400&family=Pretendard:wght@200;300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  body { font-family:'Pretendard',sans-serif; background-color:#FFFDFD; }
+  .serif-display { font-family:'Cinzel',serif; }
+  .italic-serif { font-family:'Cormorant Garamond',serif; font-style:italic; }
+  .mono { font-family:'JetBrains Mono',monospace; }
+  
+  /* 스크롤바 숨김 처리 */
+  ::-webkit-scrollbar { width:0px; height:0px; background:transparent; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  .anchor-nav a { position:relative; }
+  .anchor-nav a::after { content:''; position:absolute; bottom:-4px; left:0; width:0; height:1px; background:#E5A9A9; transition:width .4s; }
+  .anchor-nav a:hover::after, .anchor-nav a.active::after { width:100%; }
+  .anchor-nav a.active { color:#332A24; }
+
+  .glow { position:fixed; pointer-events:none; z-index:0; }
+  .row-hover:hover { background:rgba(229,169,169,0.06); }
+  .shimmer { position:absolute; inset:0; background:linear-gradient(110deg,transparent,rgba(255,255,255,.5),transparent); transform:translateX(-120%); transition:transform 1s ease; }
+  .shimmer-card:hover .shimmer { transform:translateX(120%); }
+
+  /* 투명 유리 마우스 호버 시 프리즘 광원 퍼지는 효과 */
+  .glass-canvas::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(1000px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,218,224,0.15), transparent 40%);
+    z-index: 1;
+    pointer-events: none;
+    transition: background 0.3s ease;
+  }
+
+  .map-grid {
+    background-image:
+      linear-gradient(rgba(50,40,30,0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(50,40,30,0.05) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .today-row { background: linear-gradient(90deg, rgba(229,169,169,0.10), transparent); }
+
+  /* 시설소개 레이아웃 전용 클래스 */
+  .align-left-edge { padding-left: 1.5rem; }
+  .align-right-edge { padding-right: 1.5rem; }
+  @media (min-width: 1024px) {
+    .align-left-edge { padding-left: max(4rem, calc(50vw - 800px + 4rem)); }
+    .align-right-edge { padding-right: max(4rem, calc(50vw - 800px + 4rem)); }
+  }
+</style>
+</head>
+<body class="text-[#2C2C2E] antialiased overflow-x-hidden selection:bg-[#FAD0C4]">
+
+  <!-- 배경 효과 (글로우) -->
+  <div class="glow inset-0">
+    <div id="glow1" class="absolute top-[-15%] left-[-10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-[#FCEAE6] via-[#FFEFF5] to-[#EAEFFF] blur-[140px] opacity-60 transition-transform duration-700 ease-out"></div>
+    <div id="glow2" class="absolute bottom-[-20%] right-[-10%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-tr from-[#FFF0F5] via-[#F3EEFF] to-white blur-[120px] opacity-60 transition-transform duration-1000 ease-out"></div>
+  </div>
+
+  <!-- 01. 헤더 -->
+  <header class="fixed top-0 left-0 w-full z-50 px-6 lg:px-[160px] py-5 flex justify-between items-center border-b border-white/30 bg-white/40 backdrop-blur-md">
+    <div class="flex flex-col">
+      <span class="text-xl font-semibold tracking-[0.22em] text-[#332A24]">WOOTEAHA SKIN</span>
+      <span class="text-sm tracking-[0.2em] text-[#A28B7E] font-light mt-0.5">SINCE 1975</span>
+    </div>
+    <nav id="navLinks" class="anchor-nav hidden lg:flex space-x-8 text-base tracking-[0.14em] font-normal text-[#4A4A4A]">
+      <a href="index_doctor_info.html">의료진안내</a>
+      <a href="#floor-guide">층별안내</a>
+      <a href="#info">공지 및 진료안내</a>
+      <a href="#map">오시는길</a>
+    </nav>
+  </header>
+
+  <main class="relative z-10 w-full">
+
+    <!-- 02. 메인 히어로 섹션 -->
+    <section id="hero" class="glass-canvas relative min-h-screen w-full flex flex-col justify-center px-6 lg:px-[160px] pt-32 pb-20 overflow-hidden">
+      <!-- 1976 워터마크 모바일 숨김 (hidden md:block 추가) -->
+      <div class="hidden md:block absolute z-0 right-[-5%] top-[15%] serif-display text-[25vw] font-bold text-[#E5A9A9]/5 select-none pointer-events-none">
+        1976
+      </div>
+     
+      <!-- 메인 텍스트 영역 (모바일 최적화) -->
+      <div class="z-10 w-full max-w-7xl pl-0 md:pl-[10%]">
+        <div class="inline-flex items-center space-x-3 mb-8 md:mb-10 group cursor-pointer">
+          <div class="w-8 h-[1px] bg-[#332A24]/40 group-hover:w-16 transition-all duration-500"></div>
+          <span class="text-[12px] md:text-[14px] tracking-[0.3em] text-[#A28B7E] uppercase font-light">THE 50-YEAR HERITAGE</span>
+        </div>
+
+        <h1 class="text-[32px] md:text-[52px] lg:text-[64px] font-light text-[#221C18] leading-[1.2] tracking-tight mb-8 md:mb-10" style="word-break: keep-all;">
+          1975년 이래 피부과 진료를 이어온<br>
+          <span class="font-medium text-[#E5A9A9]">피부과의 자존심.</span>
+        </h1>
+
+        <div class="flex space-x-6 border-l border-[#332A24]/10 pl-5 md:pl-6 mb-12">
+          <p class="text-[15px] md:text-[18px] text-[#5C544F] font-light leading-relaxed max-w-2xl tracking-wide">
+            피부 본연의 결을 맑게 깨우는 정교한 메디컬 케어와 타협 없는 안전을 지향합니다.<br>
+            오직 피부의 본질에만 집중하는 정직함을 기준으로, 수십 년간 대를 이어 찾아오는<br>
+            가장 신뢰할 수 있는 병원입니다.
+          </p>
+        </div>
+
+        <div class="flex items-center space-x-8">
+          <a href="#" class="text-[12px] md:text-[14px] tracking-[0.2em] text-[#332A24] font-medium uppercase group flex items-center space-x-4">
+            <span>Explore The 50Y History</span>
+            <span class="w-10 h-10 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:text-white transition-all duration-500">➔</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- 하단 미용 시술 배너 (스크롤 반응형 플로팅 배너 - 모바일 하단 여백 bottom-24로 늘림) -->
+      <div id="heroBanner" class="absolute bottom-24 md:bottom-8 left-6 right-6 lg:left-1/2 lg:-translate-x-1/2 lg:w-[calc(100%-320px)] max-w-[1280px] bg-white/30 backdrop-blur-xl border border-white/60 shadow-[0_20px_40px_-10px_rgba(235,200,200,0.2)] rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center justify-between z-20 group cursor-pointer hover:bg-white/50 transition-all duration-700 opacity-100 translate-y-0">
+        <div class="flex items-center gap-4 md:gap-5">
+          <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#FCDED7] to-[#E8EAFF] flex items-center justify-center shrink-0">
+            <span class="text-[#332A24] text-lg">✨</span>
+          </div>
+          <div>
+            <p class="text-[11px] md:text-[12px] tracking-[0.2em] text-[#A28B7E] font-medium mb-1">AESTHETIC CLINIC</p>
+            <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18]">피부 본연의 광채를 깨우는 프리미엄 미용 시술</h3>
+          </div>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center gap-3 w-full md:w-auto justify-end">
+          <span class="text-[13px] md:text-[14px] text-[#5C544F] font-light">이달의 프로모션 확인하기</span>
+          <div class="w-8 h-8 md:w-10 md:h-10 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:border-[#332A24] group-hover:text-white transition-all duration-300">
+            <span class="text-xs md:text-sm -mt-0.5">➔</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 컨테이너 그룹 1 -->
+    <div class="px-6 lg:px-16 pb-10 max-w-[1600px] mx-auto">
+      <section id="stats" class="mb-28">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-6 text-center">
+            <span class="text-[14px] md:text-[15px] tracking-[0.18em] text-[#A28B7E] block mb-1">CLINICAL YEARS</span>
+            <span class="serif-display text-[28px] md:text-[33px] font-light text-[#332A24]">50<span class="text-[14px] md:text-[15px] text-[#E5A9A9] ml-0.5">+</span></span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-6 text-center">
+            <span class="text-[14px] md:text-[15px] tracking-[0.18em] text-[#A28B7E] block mb-1">SAFETY RATE</span>
+            <span class="serif-display text-[28px] md:text-[33px] font-light text-[#332A24]">99.9<span class="text-[14px] md:text-[15px] text-[#E5A9A9] ml-0.5">%</span></span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-6 text-center">
+            <span class="text-[14px] md:text-[15px] tracking-[0.18em] text-[#A28B7E] block mb-1">TOTAL CASES</span>
+            <span class="serif-display text-[28px] md:text-[33px] font-light text-[#332A24]">340k</span>
+          </div>
+          <div class="bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-6 text-center">
+            <span class="text-[14px] md:text-[15px] tracking-[0.18em] text-[#A28B7E] block mb-1">SPECIALISTS</span>
+            <span class="serif-display text-[28px] md:text-[33px] font-light text-[#332A24]">100<span class="text-[14px] md:text-[15px] text-[#E5A9A9] ml-0.5">%</span></span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- 04. 시그니처 레이저 시술 섹션 -->
+    <section id="facility" class="mb-32 w-full flex flex-col lg:flex-row lg:items-center align-left-edge overflow-hidden relative">
+      <div class="w-full lg:w-[360px] shrink-0 pr-6 lg:pr-12 mb-8 lg:mb-0 pt-6">
+        <span class="text-[14px] md:text-[16px] text-[#A28B7E] font-light block mb-3">Procedures</span>
+        <h2 class="text-[24px] md:text-[32px] font-semibold text-[#221C18] tracking-tight mb-6 leading-tight">
+          시그니처<br class="hidden lg:block"> 레이저 시술
+        </h2>
+        <p class="text-[16px] text-[#5C544F] font-light leading-relaxed mb-10 hidden lg:block">
+          피부 본연의 아름다움을<br>되찾아 드리는 우태하한승경만의<br>프리미엄 레이저 솔루션.
+        </p>
+        
+        <a href="#" class="text-sm tracking-[0.1em] text-[#332A24] flex items-center space-x-2 w-fit border-b border-[#332A24]/30 pb-1 hover:border-[#332A24] transition-colors mb-10">
+          <span>VIEW MORE</span>
+          <span class="text-xs">➔</span>
+        </a>
+
+        <div class="hidden lg:flex space-x-2">
+          <button id="prevBtn" class="w-10 h-10 rounded-full border border-[#332A24]/15 flex items-center justify-center text-[#A28B7E] hover:bg-[#332A24] hover:text-white transition-colors focus:outline-none">
+            <span class="text-xl -mt-1">‹</span>
+          </button>
+          <button id="nextBtn" class="w-10 h-10 rounded-full border border-[#332A24]/15 flex items-center justify-center text-[#A28B7E] hover:bg-[#332A24] hover:text-white transition-colors focus:outline-none">
+            <span class="text-xl -mt-1">›</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="w-full flex-1 min-w-0 relative">
+        <div id="facilityTrack" class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-8 align-right-edge" style="padding-bottom: 0;">
+          <!-- 시그니처 카드들 -->
+          <div class="shimmer-card relative h-[460px] w-[80vw] sm:w-[320px] lg:w-[360px] shrink-0 snap-start rounded-[24px] md:rounded-[30px] overflow-hidden border border-[#332A24]/10 group">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#FCDED7] via-[#FFF1F6] to-[#E8EAFF] group-hover:scale-110 transition-transform duration-1000 ease-out z-0"></div>
+            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=800&q=80" alt="피코슈어 프로" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out z-0" />
+            <div class="absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4 bg-white/60 backdrop-blur-xl rounded-[14px] md:rounded-2xl p-4 border border-white/60 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-10">
+              <span class="text-[12px] md:text-[13px] tracking-[0.16em] text-[#332A24] font-medium block mb-1">SIGNATURE 01</span>
+              <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18] tracking-wide">피코슈어 프로 (색소/잡티)</h3>
+            </div>
+            <div class="shimmer z-20"></div>
+          </div>
+          <div class="shimmer-card relative h-[460px] w-[80vw] sm:w-[320px] lg:w-[360px] shrink-0 snap-start rounded-[24px] md:rounded-[30px] overflow-hidden border border-[#332A24]/10 group">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#E8EAFF] via-[#F3EEFF] to-[#FFF1F6] group-hover:scale-110 transition-transform duration-1000 ease-out z-0"></div>
+            <img src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=800&q=80" alt="써마지 FLX" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out z-0" />
+            <div class="absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4 bg-white/60 backdrop-blur-xl rounded-[14px] md:rounded-2xl p-4 border border-white/60 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-10">
+              <span class="text-[12px] md:text-[13px] tracking-[0.16em] text-[#332A24] font-medium block mb-1">SIGNATURE 02</span>
+              <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18] tracking-wide">써마지 FLX (탄력/리프팅)</h3>
+            </div>
+            <div class="shimmer z-20"></div>
+          </div>
+          <div class="shimmer-card relative h-[460px] w-[80vw] sm:w-[320px] lg:w-[360px] shrink-0 snap-start rounded-[24px] md:rounded-[30px] overflow-hidden border border-[#332A24]/10 group">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#FFF0F5] via-[#FCEAE6] to-[#E8EAFF] group-hover:scale-110 transition-transform duration-1000 ease-out z-0"></div>
+           <img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" alt="울쎄라" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out z-0" />
+            <div class="absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4 bg-white/60 backdrop-blur-xl rounded-[14px] md:rounded-2xl p-4 border border-white/60 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-10">
+              <span class="text-[12px] md:text-[13px] tracking-[0.16em] text-[#332A24] font-medium block mb-1">SIGNATURE 03</span>
+              <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18] tracking-wide">울쎄라 (윤곽/리프팅)</h3>
+            </div>
+            <div class="shimmer z-20"></div>
+          </div>
+          <div class="shimmer-card relative h-[460px] w-[80vw] sm:w-[320px] lg:w-[360px] shrink-0 snap-start rounded-[24px] md:rounded-[30px] overflow-hidden border border-[#332A24]/10 group">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#EAEFFF] via-[#FFEFF5] to-[#FCDED7] group-hover:scale-110 transition-transform duration-1000 ease-out z-0"></div>
+           <img src="https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?auto=format&fit=crop&w=800&q=80" alt="브이빔 퍼펙타" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out z-0" />
+            <div class="absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4 bg-white/60 backdrop-blur-xl rounded-[14px] md:rounded-2xl p-4 border border-white/60 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-10">
+              <span class="text-[12px] md:text-[13px] tracking-[0.16em] text-[#332A24] font-medium block mb-1">SIGNATURE 04</span>
+              <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18] tracking-wide">브이빔 퍼펙타 (홍조/혈관)</h3>
+            </div>
+            <div class="shimmer z-20"></div>
+          </div>
+          <div class="shimmer-card relative h-[460px] w-[80vw] sm:w-[320px] lg:w-[360px] shrink-0 snap-start rounded-[24px] md:rounded-[30px] overflow-hidden border border-[#332A24]/10 group">
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#FCDED7] via-[#FFF1F6] to-[#E8EAFF] group-hover:scale-110 transition-transform duration-1000 ease-out z-0"></div>
+            <img src="https://images.unsplash.com/photo-1552566626-52f8b828add9?auto=format&fit=crop&w=800&q=80" alt="레블라이트 SI" class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out z-0" />
+            <div class="absolute inset-x-3 bottom-3 md:inset-x-4 md:bottom-4 bg-white/60 backdrop-blur-xl rounded-[14px] md:rounded-2xl p-4 border border-white/60 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500 z-10">
+              <span class="text-[12px] md:text-[13px] tracking-[0.16em] text-[#332A24] font-medium block mb-1">SIGNATURE 05</span>
+              <h3 class="text-[15px] md:text-[18px] font-medium text-[#221C18] tracking-wide">레블라이트 SI (토닝/미백)</h3>
+            </div>
+            <div class="shimmer z-20"></div>
+          </div>
+        </div>
+        <!-- 우측 페이드 아웃 그라데이션 오버레이 -->
+        <div class="absolute top-0 right-0 w-16 md:w-32 h-[460px] bg-gradient-to-l from-[#FFFDFD] to-transparent pointer-events-none z-30"></div>
+      </div>
+    </section>
+
+    <!-- ===================== 04-2. 층별 시설 안내 섹션 ===================== -->
+    <section id="floor-guide" class="mb-20 md:mb-32 w-full max-w-[1600px] mx-auto px-6 lg:px-16">
+      
+      <div class="flex flex-col mb-[24px]">
+        <span class="text-[14px] md:text-[16px] text-[#A28B7E] font-light tracking-widest mb-1">Floor Guide</span>
+        <h2 class="text-[24px] md:text-[32px] font-semibold text-[#221C18] tracking-tight mb-[8px]">
+          층별 시설 안내
+        </h2>
+        
+        <p class="text-[14px] md:text-[15px] text-[#5C544F] font-light leading-relaxed">
+          ※ 접수 및 안내는 2층 데스크를 찾아주세요.
+        </p>
+      </div>
+
+      <!-- 좌우 레이아웃 Flex -->
+      <div class="flex flex-col lg:flex-row gap-8 lg:gap-16 lg:items-stretch relative">
+        
+        <!-- Left: Interactive Image (모바일 aspect-video, PC aspect-[4/3] 반영) -->
+        <div class="w-full lg:w-[42%] shrink-0 rounded-[20px] md:rounded-[30px] overflow-hidden aspect-video md:aspect-[4/3] border border-white/50 shadow-[0_30px_80px_-20px_rgba(235,200,200,0.2)] bg-white/20 backdrop-blur-md relative z-10">
+          <div id="floorImageContainer" class="absolute inset-0 w-full h-full">
+            <!-- 2F (Default Active) -->
+            <img id="img-2f" src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80" alt="2F 접수 안내 및 원장실" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out opacity-100 z-10">
+            <!-- 3F -->
+            <img id="img-3f" src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80" alt="3F 회복 및 라운지" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out opacity-0 z-0">
+            <!-- 4F -->
+            <img id="img-4f" src="https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80" alt="4F 스킨케어 및 에스테틱" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out opacity-0 z-0">
+            <!-- 5F -->
+            <img id="img-5f" src="https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=800&q=80" alt="5F 스튜디오 및 컨시어지" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out opacity-0 z-0">
+          </div>
+          <!-- 장식용 오버레이 -->
+          <div class="absolute inset-0 bg-gradient-to-tr from-[#E8EAFF]/10 via-transparent to-[#FCDED7]/10 z-20 pointer-events-none"></div>
+        </div>
+
+        <!-- Right: Interactive Floor List -->
+        <div class="w-full flex-1 flex flex-col justify-between py-2">
+          
+          <!-- 2F (Default Active) -->
+          <div class="floor-item group cursor-pointer flex-1 flex items-center justify-between border-b border-[#332A24]/10 transition-colors py-5 lg:py-0" data-target="img-2f">
+            <div class="flex items-center gap-4 lg:gap-8">
+              <span class="floor-number serif-display text-[44px] text-[#332A24] font-light transition-colors duration-500 w-16 lg:w-20">2F</span>
+              <h3 class="text-[18px] md:text-[22px] font-medium text-[#221C18]">접수 안내 및 원장실</h3>
+            </div>
+            <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:border-[#332A24] group-hover:text-white transition-all duration-300 shrink-0">
+              <span class="text-xs -mt-0.5">➔</span>
+            </span>
+          </div>
+
+          <!-- 3F -->
+          <div class="floor-item group cursor-pointer flex-1 flex items-center justify-between border-b border-[#332A24]/10 transition-colors py-5 lg:py-0" data-target="img-3f">
+            <div class="flex items-center gap-4 lg:gap-8">
+              <span class="floor-number serif-display text-[44px] text-[#A28B7E]/50 font-light transition-colors duration-500 w-16 lg:w-20">3F</span>
+              <h3 class="text-[18px] md:text-[22px] font-medium text-[#221C18]">회복 및 라운지</h3>
+            </div>
+            <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:border-[#332A24] group-hover:text-white transition-all duration-300 shrink-0">
+              <span class="text-xs -mt-0.5">➔</span>
+            </span>
+          </div>
+
+          <!-- 4F -->
+          <div class="floor-item group cursor-pointer flex-1 flex items-center justify-between border-b border-[#332A24]/10 transition-colors py-5 lg:py-0" data-target="img-4f">
+            <div class="flex items-center gap-4 lg:gap-8">
+              <span class="floor-number serif-display text-[44px] text-[#A28B7E]/50 font-light transition-colors duration-500 w-16 lg:w-20">4F</span>
+              <h3 class="text-[18px] md:text-[22px] font-medium text-[#221C18]">스킨케어 및 에스테틱</h3>
+            </div>
+            <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:border-[#332A24] group-hover:text-white transition-all duration-300 shrink-0">
+              <span class="text-xs -mt-0.5">➔</span>
+            </span>
+          </div>
+
+          <!-- 5F -->
+          <div class="floor-item group cursor-pointer flex-1 flex items-center justify-between transition-colors py-5 lg:py-0" data-target="img-5f">
+            <div class="flex items-center gap-4 lg:gap-8">
+              <span class="floor-number serif-display text-[44px] text-[#A28B7E]/50 font-light transition-colors duration-500 w-16 lg:w-20">5F</span>
+              <h3 class="text-[18px] md:text-[22px] font-medium text-[#221C18]">스튜디오 및 컨시어지</h3>
+            </div>
+            <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center group-hover:bg-[#332A24] group-hover:border-[#332A24] group-hover:text-white transition-all duration-300 shrink-0">
+              <span class="text-xs -mt-0.5">➔</span>
+            </span>
+          </div>
+          
+        </div>
+      </div>
+    </section>
+
+    <!-- 컨테이너 그룹 2 -->
+    <div class="px-6 lg:px-16 pb-10 max-w-[1600px] mx-auto">
+
+      <!-- 05, 06. 통합 섹션 (인라인 여백 제거) -->
+      <section id="info" class="mb-20 md:mb-28">
+        <div class="flex flex-wrap lg:flex-nowrap justify-between gap-10 lg:gap-8 mb-10 w-full">
+          
+          <!-- 공지사항 레이아웃 변경 (유연한 너비) -->
+          <div class="w-full lg:flex-[6] lg:max-w-[940px]">
+            <div class="mb-6 flex justify-between items-end">
+              <div class="flex flex-col">
+                <span class="text-[14px] md:text-[16px] text-[#A28B7E] font-light tracking-widest mb-1">Notice</span>
+                <h2 class="text-[24px] md:text-[32px] font-semibold text-[#221C18] tracking-tight">공지사항</h2>
+              </div>
+              <button class="text-sm tracking-[0.1em] border-none text-[#777] font-light px-2 py-2 rounded-none hover:text-black transition-all duration-500 mb-1">
+                + 전체보기
+              </button>
+            </div>
+            
+            <!-- 공지 리스트 래퍼 (height 고정값 제거) -->
+            <div class="rounded-[20px] md:rounded-[30px] border border-white/50 bg-white/20 backdrop-blur-2xl overflow-hidden shadow-[0_30px_80px_-20px_rgba(235,200,200,0.18)] flex-1 flex flex-col justify-center py-2 md:py-4 h-auto">
+              <div class="row-hover flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-[#332A24]/6 transition-colors cursor-pointer gap-3 md:gap-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  <span class="text-[12px] md:text-[13px] tracking-[0.06em] px-2 py-1 md:px-3 md:py-1.5 rounded-full bg-[#332A24] text-white w-[50px] md:w-[60px] text-center flex-shrink-0">공지</span>
+                  <span class="text-[14px] md:text-[18px] text-[#221C18] font-medium truncate">2026년 하절기 진료시간 변경 안내</span>
+                </div>
+                <span class="mono text-[12px] md:text-[14px] text-[#A28B7E] shrink-0">2026.06.20</span>
+              </div>
+              
+              <div class="row-hover flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-[#332A24]/6 transition-colors cursor-pointer gap-3 md:gap-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  <span class="text-[12px] md:text-[13px] tracking-[0.06em] px-2 py-1 md:px-3 md:py-1.5 rounded-full bg-[#E5A9A9]/20 text-[#B5777A] w-[50px] md:w-[60px] text-center flex-shrink-0">장비</span>
+                  <span class="text-[14px] md:text-[18px] text-[#221C18] font-medium truncate">신규 피코 레이저 장비 도입 안내</span>
+                </div>
+                <span class="mono text-[12px] md:text-[14px] text-[#A28B7E] shrink-0">2026.06.12</span>
+              </div>
+              
+              <div class="row-hover flex items-center justify-between px-5 py-4 md:px-8 md:py-5 border-b border-[#332A24]/6 transition-colors cursor-pointer gap-3 md:gap-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  <span class="text-[12px] md:text-[13px] tracking-[0.06em] px-2 py-1 md:px-3 md:py-1.5 rounded-full bg-[#332A24]/8 text-[#5C544F] w-[50px] md:w-[60px] text-center flex-shrink-0">안내</span>
+                  <span class="text-[14px] md:text-[18px] text-[#221C18] font-medium truncate">개인정보 처리방침 개정 사전 고지</span>
+                </div>
+                <span class="mono text-[12px] md:text-[14px] text-[#A28B7E] shrink-0">2026.05.28</span>
+              </div>
+              
+              <div class="row-hover flex items-center justify-between px-5 py-4 md:px-8 md:py-5 transition-colors cursor-pointer gap-3 md:gap-4">
+                <div class="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
+                  <span class="text-[12px] md:text-[13px] tracking-[0.06em] px-2 py-1 md:px-3 md:py-1.5 rounded-full bg-[#332A24]/8 text-[#5C544F] w-[50px] md:w-[60px] text-center flex-shrink-0">안내</span>
+                  <span class="text-[14px] md:text-[18px] text-[#221C18] font-medium truncate">창립 50주년 기념 휴진 일정 공지</span>
+                </div>
+                <span class="mono text-[12px] md:text-[14px] text-[#A28B7E] shrink-0">2026.05.02</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 진료시간 레이아웃 변경 (유연한 너비) -->
+          <div class="w-full lg:flex-[4] lg:max-w-[500px]">
+            <div class="mb-6 flex flex-col">
+              <span class="text-[14px] md:text-[16px] text-[#A28B7E] font-light tracking-widest mb-1">Clinic Hours</span>
+              <h2 class="text-[24px] md:text-[32px] font-semibold text-[#221C18] tracking-tight">진료시간</h2>
+            </div>
+            
+            <div class="rounded-[20px] md:rounded-[30px] border border-white/50 bg-white/20 backdrop-blur-2xl p-2 md:p-3 shadow-[0_30px_80px_-20px_rgba(235,200,200,0.18)] flex-1 flex flex-col justify-center py-4">
+              <div class="today-row rounded-[16px] md:rounded-[22px] grid grid-cols-[1fr_auto_auto] items-center px-4 md:px-6 py-3 md:py-[18px] gap-2">
+                <span class="text-[14px] md:text-[18px] font-medium text-[#221C18]">월 · 수 · 금</span>
+                <span class="mono text-[13px] md:text-[16px] text-[#5C544F]">10:00 – 19:00</span>
+                <div class="flex justify-end"><span class="text-[10px] md:text-[11px] tracking-[0.1em] px-2 py-1 rounded-full bg-[#E5A9A9] text-white">TODAY</span></div>
+              </div>
+              <div class="grid grid-cols-[1fr_auto_auto] items-center px-4 md:px-6 py-3 md:py-[18px] gap-2">
+                <span class="text-[14px] md:text-[18px] font-medium text-[#221C18]">화 · 목 <span class="font-light text-[12px] md:text-sm text-[#5C544F] ml-1">(야간)</span></span>
+                <span class="mono text-[13px] md:text-[16px] text-[#5C544F]">10:00 – 20:00</span>
+                <span></span>
+              </div>
+              <div class="grid grid-cols-[1fr_auto_auto] items-center px-4 md:px-6 py-3 md:py-[18px] gap-2">
+                <span class="text-[14px] md:text-[18px] font-medium text-[#221C18]">토요일</span>
+                <span class="mono text-[13px] md:text-[16px] text-[#5C544F]">10:00 – 15:00</span>
+                <span></span>
+              </div>
+              <div class="grid grid-cols-[1fr_auto_auto] items-center px-4 md:px-6 py-3 md:py-[18px] gap-2">
+                <span class="text-[14px] md:text-[18px] font-medium text-[#A28B7E]">점심시간</span>
+                <span class="mono text-[13px] md:text-[16px] text-[#A28B7E]">13:00 – 14:00</span>
+                <span></span>
+              </div>
+              <div class="grid grid-cols-[1fr_auto_auto] items-center px-4 md:px-6 py-3 md:py-[18px] gap-2">
+                <span class="text-[14px] md:text-[18px] font-medium text-[#A28B7E]">일요일 · 공휴일</span>
+                <span class="mono text-[13px] md:text-[16px] text-[#A28B7E]">휴진</span>
+                <span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="w-full rounded-[24px] md:rounded-[30px] border border-white/50 bg-gradient-to-br from-[#FCDED7] via-[#FFF1F6] to-[#E8EAFF] p-6 md:p-12 flex flex-col md:flex-row justify-between items-start md:items-center shadow-[0_30px_80px_-20px_rgba(235,200,200,0.18)]">
+          <div>
+            <span class="text-[11px] md:text-[14px] tracking-[0.18em] text-[#332A24] font-medium block mb-2">RESERVATION</span>
+            <p class="text-[15px] md:text-[22px] font-medium text-[#221C18] mb-2 leading-relaxed">초진은 사전 예약 후 방문을 안내드립니다.</p>
+            <p class="text-[13px] md:text-[15px] text-[#635751] font-light leading-relaxed">진료 마감 30분 전까지 접수해주세요. 시술 상담은 평균 20–30분 소요됩니다.</p>
+          </div>
+          <button class="mt-6 md:mt-0 text-[13px] md:text-sm tracking-[0.1em] bg-[#332A24] text-white px-4 py-3 md:px-6 rounded-none hover:bg-[#E5A9A9] transition-all duration-500 w-full md:w-auto shrink-0">예약 문의하기</button>
+        </div>
+      </section>
+
+      <!-- 07. 오시는 길 -->
+      <section id="map" class="mb-20 md:mb-28">
+        <div class="flex flex-col mb-6 md:mb-8">
+          <span class="text-[14px] md:text-[16px] text-[#A28B7E] font-light mb-1 uppercase tracking-widest">Kakao Map</span>
+          <h2 class="text-[24px] md:text-[32px] font-semibold text-[#221C18] tracking-tight">오시는 길</h2>
+        </div>
+
+        <div class="rounded-[24px] md:rounded-[40px] border border-white/50 bg-white/20 backdrop-blur-2xl overflow-hidden shadow-[0_40px_100px_-15px_rgba(235,200,200,0.18)] grid lg:grid-cols-[1fr_360px]">
+          <div class="relative h-[280px] md:h-[360px] lg:h-[460px] map-grid bg-[#FBF7F5]">
+            <div id="kakaoMap" class="absolute inset-0"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#332A24] flex items-center justify-center shadow-lg mb-2 md:mb-3">
+                <span class="text-white text-sm md:text-base">📍</span>
+              </div>
+              <p class="text-[12px] md:text-sm text-[#A28B7E] tracking-wide">Kakao Map SDK Mount Point</p>
+              <p class="mono text-[12px] md:text-sm text-[#C9B8AE] mt-1">#kakaoMap</p>
+            </div>
+          </div>
+
+          <div class="p-6 md:p-9 flex flex-col justify-between">
+            <div>
+              <span class="text-[12px] md:text-sm tracking-[0.18em] text-[#A28B7E] block mb-2 md:mb-3">LOCATION</span>
+              <h3 class="serif-display text-base md:text-lg text-[#221C18] tracking-wide mb-4">우태하 한승경 피부과</h3>
+              <div class="space-y-2.5 md:space-y-3 text-[13px] md:text-sm text-[#5C544F] font-light">
+                <p class="flex"><span class="w-12 md:w-14 text-[#A28B7E] shrink-0">주소</span>서울특별시 강남구 압구정로 123, 4층</p>
+                <p class="flex"><span class="w-12 md:w-14 text-[#A28B7E] shrink-0">전화</span>02-1234-5678</p>
+                <p class="flex"><span class="w-12 md:w-14 text-[#A28B7E] shrink-0">지하철</span>압구정로데오역 5번 출구 도보 3분</p>
+                <p class="flex"><span class="w-12 md:w-14 text-[#A28B7E] shrink-0">주차</span>건물 내 발렛 30분 무료</p>
+              </div>
+            </div>
+            <div class="flex space-x-2 md:space-x-3 mt-6 md:mt-8">
+              <button onclick="window.open('https://map.kakao.com')" class="flex-1 text-[12px] md:text-sm tracking-[0.1em] bg-[#332A24] text-white px-2 py-3 md:px-4 rounded-none hover:bg-[#E5A9A9] transition-all duration-500">카카오맵 길찾기</button>
+              <button onclick="window.open('https://map.naver.com')" class="flex-1 text-[12px] md:text-sm tracking-[0.1em] border border-[#332A24]/20 text-[#332A24] px-2 py-3 md:px-4 rounded-none hover:bg-[#332A24] hover:text-white transition-all duration-500">네이버지도</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 주차 안내 문구 -->
+        <p class="text-[12px] md:text-sm text-[#A28B7E] font-light mt-4 leading-relaxed px-1">※ 자차로 내원 시 건물 전면에서 발렛 파킹 서비스를 이용하실 수 있습니다. (30분 무료 주차 지원, 이후 추가 요금 발생)</p>
+      </section>
+
+    </div> 
+  </main>
+
+  <!-- 08. 푸터 -->
+  <footer id="footer" class="relative z-10 border-t border-[#332A24]/10 bg-white/40 backdrop-blur-md">
+    <div class="max-w-[1600px] mx-auto px-6 lg:px-16 py-12 md:py-16 grid grid-cols-1 md:grid-cols-[1.3fr_1fr_1fr_1fr] gap-10">
+      <div>
+        <span class="serif-display text-lg font-semibold tracking-[0.18em] text-[#332A24] block">WOOTAEHA</span>
+        <span class="text-sm tracking-[0.2em] text-[#A28B7E] font-light mt-1 block mb-5">ANSEUNGKYUNG DERMATOLOGY</span>
+        <p class="text-[13px] md:text-sm text-[#5C544F] font-light leading-relaxed max-w-xs">유리처럼 투명한 정직함, 50년의 시간이 증명하는 무결한 안전성.</p>
+      </div>
+      <div>
+        <p class="text-[12px] md:text-sm tracking-[0.16em] text-[#A28B7E] mb-4">QUICK LINKS</p>
+        <ul class="space-y-2.5 text-[13px] md:text-sm text-[#4A4A4A] font-light">
+          <li><a href="#" class="hover:text-[#E5A9A9] transition-colors">THE ARCHIVE</a></li>
+          <li><a href="#" class="hover:text-[#E5A9A9] transition-colors">ABSOLUTE SAFETY</a></li>
+          <li><a href="#" class="hover:text-[#E5A9A9] transition-colors">MASTERS</a></li>
+          <li><a href="#info" class="hover:text-[#E5A9A9] transition-colors">공지사항</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-[12px] md:text-sm tracking-[0.16em] text-[#A28B7E] mb-4">CONTACT</p>
+        <ul class="space-y-2.5 text-[13px] md:text-sm text-[#4A4A4A] font-light">
+          <li>02-1234-5678</li>
+          <li>hello@wootaeha-clinic.kr</li>
+          <li>평일 10:00 – 19:00</li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-[12px] md:text-sm tracking-[0.16em] text-[#A28B7E] mb-4">FOLLOW</p>
+        <div class="flex space-x-3">
+          <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center text-sm text-[#332A24] hover:bg-[#332A24] hover:text-white transition-colors cursor-pointer">IG</span>
+          <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center text-sm text-[#332A24] hover:bg-[#332A24] hover:text-white transition-colors cursor-pointer">BL</span>
+          <span class="w-9 h-9 rounded-full border border-[#332A24]/20 flex items-center justify-center text-sm text-[#332A24] hover:bg-[#332A24] hover:text-white transition-colors cursor-pointer">YT</span>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-[#332A24]/8">
+      <div class="max-w-[1600px] mx-auto px-6 lg:px-16 py-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-3 md:gap-2">
+        <p class="text-[12px] md:text-sm text-[#A28B7E] font-light leading-relaxed">
+          (주)우태하한승경피부과 · 대표원장 한승경 · 사업자등록번호 123-45-67890 · 서울특별시 강남구 압구정로 123, 4층
+        </p>
+        <p class="text-[12px] md:text-sm text-[#A28B7E] font-light">© 1976–2026 WOOTAEHA ANSEUNGKYUNG. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- 09. 스크립트 -->
+  <script>
+    const canvas = document.querySelector('.glass-canvas');
+    if (canvas) {
+      document.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        canvas.style.setProperty('--mouse-x', `${x}px`);
+        canvas.style.setProperty('--mouse-y', `${y}px`);
+      });
+    }
+
+    const glow1 = document.getElementById('glow1');
+    const glow2 = document.getElementById('glow2');
+    document.addEventListener('mousemove', (e) => {
+      const moveX = (e.clientX - window.innerWidth / 2) * 0.03;
+      const moveY = (e.clientY - window.innerHeight / 2) * 0.03;
+      if (glow1 && glow2) {
+        glow1.style.transform = `translate(${moveX}px, ${moveY}px)`;
+        glow2.style.transform = `translate(${-moveX}px, ${-moveY}px)`;
+      }
+    });
+
+    const navLinks = document.querySelectorAll('#navLinks a');
+    const sections = [...navLinks].map(a => document.querySelector(a.getAttribute('href')));
+    const heroBanner = document.getElementById('heroBanner');
+    
+    window.addEventListener('scroll', () => {
+      // 내비게이션 활성화 로직
+      let activeIndex = 0;
+      sections.forEach((sec, i) => {
+        if (sec && sec.getBoundingClientRect().top <= 120) activeIndex = i;
+      });
+      navLinks.forEach((a, i) => a.classList.toggle('active', i === activeIndex));
+
+      // 스크롤 시 히어로 하단 배너 페이드 아웃 로직
+      if (heroBanner) {
+        if (window.scrollY > 80) { // 스크롤을 80px 이상 내렸을 때
+          heroBanner.classList.remove('opacity-100', 'translate-y-0');
+          heroBanner.classList.add('opacity-0', 'translate-y-8', 'pointer-events-none');
+        } else { // 다시 최상단으로 올렸을 때
+          heroBanner.classList.remove('opacity-0', 'translate-y-8', 'pointer-events-none');
+          heroBanner.classList.add('opacity-100', 'translate-y-0');
+        }
+      }
+    });
+
+    const track = document.getElementById('facilityTrack');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    if (track && prevBtn && nextBtn) {
+      prevBtn.addEventListener('click', () => {
+        const cardWidth = track.firstElementChild.offsetWidth + 24;
+        track.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+      });
+      nextBtn.addEventListener('click', () => {
+        const cardWidth = track.firstElementChild.offsetWidth + 24;
+        track.scrollBy({ left: cardWidth, behavior: 'smooth' });
+      });
+    }
+
+    // 층별 시설 안내 인터랙티브 리스트 컨트롤
+    const floorItems = document.querySelectorAll('.floor-item');
+    const floorImages = document.querySelectorAll('#floorImageContainer img');
+
+    if (floorItems.length > 0 && floorImages.length > 0) {
+      floorItems.forEach(item => {
+        const activateFloor = () => {
+          floorItems.forEach(el => {
+            const num = el.querySelector('.floor-number');
+            num.classList.remove('text-[#332A24]');
+            num.classList.add('text-[#A28B7E]/50');
+          });
+          
+          const activeNum = item.querySelector('.floor-number');
+          activeNum.classList.remove('text-[#A28B7E]/50');
+          activeNum.classList.add('text-[#332A24]');
+
+          const targetId = item.getAttribute('data-target');
+          floorImages.forEach(img => {
+            if (img.id === targetId) {
+              img.classList.remove('opacity-0', 'z-0');
+              img.classList.add('opacity-100', 'z-10');
+            } else {
+              img.classList.remove('opacity-100', 'z-10');
+              img.classList.add('opacity-0', 'z-0');
+            }
+          });
+        };
+
+        item.addEventListener('mouseenter', activateFloor);
+        item.addEventListener('click', activateFloor);
+      });
+    }
+  </script>
+</body>
+</html>
